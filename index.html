@@ -38,6 +38,7 @@
       top: 0;
       left: 0;
       z-index: 1;
+      background: transparent;
     }
     
     #ar-overlay {
@@ -82,6 +83,18 @@
     .hidden {
       display: none !important;
     }
+    
+    /* Ensure camera feed is always visible as background */
+    #camera-feed {
+      display: block !important;
+      z-index: 0 !important;
+    }
+    
+    /* Make model-viewer transparent so camera shows through */
+    model-viewer {
+      background: transparent !important;
+      background-color: transparent !important;
+    }
   </style>
 </head>
 <body>
@@ -102,7 +115,8 @@
       shadow-softness="1"
       scale="1 1 1"
       ar-scale="fixed"
-      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;">
+      background-color="transparent"
+      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: transparent;">
     </model-viewer>
     <div id="ar-overlay">
       <button id="start-ar">📱 Start AR</button>
@@ -152,14 +166,18 @@
         }
         
         try {
-          // Hide overlay
+          // Hide overlay but keep camera feed visible
           arOverlay.classList.add('hidden');
+          
+          // Ensure camera feed stays visible
+          cameraFeed.style.display = 'block';
+          cameraFeed.style.zIndex = '0';
           
           // Activate AR
           await modelViewer.activateAR();
           isARActive = true;
           
-          console.log('AR activated');
+          console.log('AR activated with camera background');
           
         } catch (error) {
           console.error('Failed to activate AR:', error);
