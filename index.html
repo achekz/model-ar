@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sarcophage de la chasse – AR</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #f0f0f0;
+    }
+    model-viewer {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <model-viewer
+    src="sarcophage_de_la_chasse_arles.glb"
+    ios-src="Sarcophage_de_la_chasse_Arles.usdz"
+    alt="Sarcophage de la chasse – Musée de l'Arles antique"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1"
+    shadow-softness="1"
+    scale="1 1 1"
+    ar-scale="fixed"
+    loading="eager"
+    reveal="auto">
+  </model-viewer>
+
+</body>
+</html>
