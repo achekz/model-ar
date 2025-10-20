@@ -115,11 +115,14 @@
       shadow-softness="1"
       scale="0.3 0.3 0.3"
       ar-scale="fixed"
-      min-camera-orbit="auto auto 0.5m"
-      max-camera-orbit="auto auto 2m"
-      camera-orbit="0deg 75deg 1m"
       background-color="transparent"
       style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: transparent;">
+      
+      <!-- AR Button -->
+      <button slot="ar-button" id="model-ar-button">
+        🏛️ View in AR
+      </button>
+      
     </model-viewer>
     <div id="ar-overlay">
       <button id="start-ar">📱 Start AR</button>
@@ -169,6 +172,14 @@
         }
         
         try {
+          console.log('Attempting to activate AR...');
+          
+          // Check if AR is supported
+          if (!modelViewer.canActivateAR) {
+            alert('AR not supported on this device or browser.');
+            return;
+          }
+          
           // Hide overlay but keep camera feed visible
           arOverlay.classList.add('hidden');
           
@@ -180,11 +191,11 @@
           await modelViewer.activateAR();
           isARActive = true;
           
-          console.log('AR activated with camera background');
+          console.log('AR activated successfully');
           
         } catch (error) {
           console.error('Failed to activate AR:', error);
-          alert('AR not supported on this device or browser.');
+          alert('Failed to start AR: ' + error.message);
           arOverlay.classList.remove('hidden');
         }
       }
