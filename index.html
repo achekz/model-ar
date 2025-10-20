@@ -10,224 +10,59 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background: #000;
-      font-family: Arial, sans-serif;
+      background: #f0f0f0;
     }
-    
-    #ar-container {
-      position: relative;
+    model-viewer {
       width: 100vw;
       height: 100vh;
-      overflow: hidden;
-    }
-    
-    #camera-feed {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 0;
-    }
-    
-    model-viewer {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-      background: transparent;
-    }
-    
-    #ar-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-    }
-    
-    #start-ar {
-      background: #4CAF50;
-      border: none;
-      color: white;
-      padding: 15px 30px;
-      font-size: 18px;
-      border-radius: 25px;
-      cursor: pointer;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-    
-    #start-ar:hover {
-      background: #45a049;
-      transform: translateY(-2px);
-    }
-    
-    #instructions {
-      font-size: 16px;
-      text-align: center;
-      margin: 0;
-      padding: 0 20px;
-    }
-    
-    .hidden {
-      display: none !important;
-    }
-    
-    /* Ensure camera feed is always visible as background */
-    #camera-feed {
-      display: block !important;
-      z-index: 0 !important;
-    }
-    
-    /* Make model-viewer transparent so camera shows through */
-    model-viewer {
-      background: transparent !important;
-      background-color: transparent !important;
+      display: block;
     }
   </style>
 </head>
 <body>
 
-  <div id="ar-container">
-    <video id="camera-feed" autoplay muted playsinline></video>
-    <model-viewer
-      src="annibal_-_louvre_museum.glb"
-      ios-src="Annibal_-_Louvre_Museum.usdz"
-      alt="Annibal – Louvre Museum"
-      ar
-      ar-modes="webxr scene-viewer quick-look"
-      ar-placement="floor"
-      ar-tap-to-place="true"
-      camera-controls
-      auto-rotate
-      shadow-intensity="1"
-      shadow-softness="1"
-      scale="0.3 0.3 0.3"
-      ar-scale="fixed"
-      background-color="transparent"
-      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: transparent;">
-      
-      <!-- AR Button -->
-      <button slot="ar-button" id="model-ar-button">
-        🏛️ View in AR
-      </button>
-      
-    </model-viewer>
-    <div id="ar-overlay">
-      <button id="start-ar">📱 Start AR</button>
-      <p id="instructions">Point camera at a table or flat surface</p>
-    </div>
-  </div>
+  <model-viewer
+    src="annibal_-_louvre_museum.glb"
+    ios-src="Annibal_-_Louvre_Museum.usdz"
+    alt="Annibal – Louvre Museum"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    ar-placement="floor"
+    ar-tap-to-place="true"
+    camera-controls
+    auto-rotate
+    shadow-intensity="1"
+    shadow-softness="1"
+    scale="0.3 0.3 0.3"
+    ar-scale="fixed"
+    loading="eager"
+    reveal="auto">
+    
+    <!-- AR Button -->
+    <button slot="ar-button" id="ar-button">
+      🏛️ View in AR
+    </button>
+    
+  </model-viewer>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const cameraFeed = document.getElementById('camera-feed');
       const modelViewer = document.querySelector('model-viewer');
-      const startArButton = document.getElementById('start-ar');
-      const arOverlay = document.getElementById('ar-overlay');
-      const instructions = document.getElementById('instructions');
       
-      let cameraStream = null;
-      let isARActive = false;
-      
-      // Start camera feed
-      async function startCamera() {
-        try {
-          cameraStream = await navigator.mediaDevices.getUserMedia({
-            video: {
-              facingMode: 'environment',
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
-            }
-          });
-          
-          cameraFeed.srcObject = cameraStream;
-          console.log('Camera started successfully');
-          
-          // Show instructions
-          instructions.textContent = 'Camera ready! Point at a table or flat surface, then tap "Start AR"';
-          
-        } catch (error) {
-          console.error('Camera access denied:', error);
-          instructions.textContent = 'Camera access required for AR. Please allow camera permission and refresh.';
-        }
-      }
-      
-      // Start AR mode
-      async function startAR() {
-        if (!cameraStream) {
-          alert('Camera not available. Please allow camera permission.');
-          return;
-        }
-        
-        try {
-          console.log('Attempting to activate AR...');
-          
-          // Check if AR is supported
-          if (!modelViewer.canActivateAR) {
-            alert('AR not supported on this device or browser.');
-            return;
-          }
-          
-          // Hide overlay but keep camera feed visible
-          arOverlay.classList.add('hidden');
-          
-          // Ensure camera feed stays visible
-          cameraFeed.style.display = 'block';
-          cameraFeed.style.zIndex = '0';
-          
-          // Activate AR
-          await modelViewer.activateAR();
-          isARActive = true;
-          
-          console.log('AR activated successfully');
-          
-        } catch (error) {
-          console.error('Failed to activate AR:', error);
-          alert('Failed to start AR: ' + error.message);
-          arOverlay.classList.remove('hidden');
-        }
-      }
+      // Handle model loading
+      modelViewer.addEventListener('load', function() {
+        console.log('3D Model loaded successfully');
+      });
       
       // Handle AR status changes
       modelViewer.addEventListener('ar-status', function(event) {
         console.log('AR Status:', event.detail.status);
-        
-        if (event.detail.status === 'not-presenting') {
-          isARActive = false;
-          arOverlay.classList.remove('hidden');
-          instructions.textContent = 'AR session ended. Tap "Start AR" to try again.';
-        }
-      });
-      
-      // Handle model loading
-      modelViewer.addEventListener('load', function() {
-        console.log('3D Model loaded');
-        instructions.textContent = 'Model loaded! Point camera at a flat surface and tap "Start AR"';
       });
       
       // Handle errors
       modelViewer.addEventListener('error', function(event) {
         console.error('Model error:', event.detail);
-        instructions.textContent = 'Error loading 3D model. Please check your connection.';
       });
-      
-      // Button click handler
-      startArButton.addEventListener('click', startAR);
-      
-      // Start camera immediately
-      startCamera();
     });
   </script>
 
