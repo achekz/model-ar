@@ -49,6 +49,26 @@
     .size-btn:active {
       transform: scale(0.95);
     }
+    
+    /* Instructions overlay */
+    .instructions {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 14px;
+      text-align: center;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .instructions.show {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -68,7 +88,9 @@
     scale="0.3 0.3 0.3"
     ar-scale="fixed"
     loading="eager"
-    reveal="auto">
+    reveal="auto"
+    image-tracking
+    ar-image-target="white-paper">
     
     <!-- AR Button -->
     <button slot="ar-button" id="ar-button">
@@ -84,12 +106,21 @@
     <button class="size-btn" id="size-reset">↻</button>
   </div>
 
+  <!-- Instructions -->
+  <div class="instructions" id="instructions">
+    📄 Point your camera at a white piece of paper to see the 3D model appear on it!
+  </div>
+
+  <!-- White Paper Target (hidden) -->
+  <img id="white-paper" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjY2NjIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+UGxhY2Ugb24gd2hpdGUgcGFwZXI8L3RleHQ+Cjwvc3ZnPg==" style="display: none;" alt="White Paper Target">
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const modelViewer = document.querySelector('model-viewer');
       const sizeUpBtn = document.getElementById('size-up');
       const sizeDownBtn = document.getElementById('size-down');
       const sizeResetBtn = document.getElementById('size-reset');
+      const instructions = document.getElementById('instructions');
       
       let currentScale = 0.3; // Starting scale
       
@@ -122,6 +153,24 @@
       // Handle AR status changes
       modelViewer.addEventListener('ar-status', function(event) {
         console.log('AR Status:', event.detail.status);
+        
+        if (event.detail.status === 'presenting') {
+          console.log('AR is active - point camera at white paper');
+          instructions.classList.add('show');
+        } else {
+          instructions.classList.remove('show');
+        }
+      });
+      
+      // Handle image tracking
+      modelViewer.addEventListener('image-tracking', function(event) {
+        console.log('Image tracking status:', event.detail);
+        
+        if (event.detail.tracking) {
+          console.log('White paper detected! Model should appear on paper.');
+        } else {
+          console.log('White paper not detected. Point camera at white paper.');
+        }
       });
       
       // Handle errors
